@@ -1,6 +1,6 @@
 import { getProduct } from "@/app/prisma-db";
 import EditProductForm from "./product-edit-form";
-import { Product } from "@/app/products-db/page";
+import { Product } from "@/generated/prisma/client";
 import { notFound } from "next/navigation";
 
 export default async function EditProductPage({
@@ -9,9 +9,15 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product: Product = await getProduct(parseInt(id));
+  const productId = parseInt(id, 10);
 
-  if(!product){
+  if (isNaN(productId)) {
+    notFound();
+  }
+
+  const product = await getProduct(productId);
+
+  if (!product) {
     notFound();
   }
 
