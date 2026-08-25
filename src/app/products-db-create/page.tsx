@@ -1,19 +1,8 @@
 "use client";
 
-import { addProduct } from "../prisma-db";
-import { redirect } from "next/navigation";
 import { Submit } from "@/components/submit";
 import { useActionState } from "react";
-
-type Errors = {
-  title?: string;
-  price?: string;
-  description?: string;
-};
-
-type FormState = {
-  errors: Errors;
-};
+import { FormState, createProduct } from "@/actions/products";
 
 export default function AddProductPage() {
   const initialState: FormState = {
@@ -24,40 +13,6 @@ export default function AddProductPage() {
     createProduct,
     initialState,
   );
-
-  async function createProduct(formData: FormData) {
-    "use server";
-
-    const title = formData.get("title") as string;
-    const price = formData.get("price") as string;
-    const description = formData.get("description") as string;
-
-    const errors: Errors = {};
-
-    if (!title) {
-      errors.title = "Title is required!";
-    }
-
-    if (!price) {
-      errors.price = "Price is required!";
-    }
-
-    if (!description) {
-      errors.description = "Description is required!";
-    }
-
-    if (Object.keys(errors).length > 0) {
-      return { errors };
-    }
-
-    const priceValue = parseInt(price, 10);
-    if (!title || isNaN(priceValue)) {
-      throw new Error("Title and a valid price are required.");
-    }
-
-    await addProduct(title, priceValue, description);
-    redirect("/products-db");
-  }
 
   return (
     <form action={formAction} className="p-4 space-y-4 max-w-96">
@@ -85,7 +40,7 @@ export default function AddProductPage() {
           />
         </label>
         {state.errors.price && (
-          <p className="text-red-500">{state.errors.title}</p>
+          <p className="text-red-500">{state.errors.price}</p>
         )}
       </div>
 
@@ -98,7 +53,7 @@ export default function AddProductPage() {
           ></textarea>
         </label>
         {state.errors.description && (
-          <p className="text-red-500">{state.errors.title}</p>
+          <p className="text-red-500">{state.errors.description}</p>
         )}
       </div>
 
