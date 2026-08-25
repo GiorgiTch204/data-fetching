@@ -83,6 +83,6 @@ export async function editProduct(
 }
 
 export async function removeProduct(id: number) {
-  deleteProduct(id);
+  await deleteProduct(id);
   revalidatePath("/products-db");
 }
