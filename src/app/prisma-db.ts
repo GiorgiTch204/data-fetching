@@ -1,4 +1,3 @@
-import { title } from "process";
 import { PrismaClient } from "../generated/prisma/client";
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 
@@ -7,6 +6,14 @@ const adapter = new PrismaBetterSqlite3({
 });
 
 const prisma = new PrismaClient({ adapter });
+
+const MAX_PRICE = 1_000_000; // adjust to whatever ceiling makes sense for your domain
+
+function assertValidPrice(price: number) {
+  if (!Number.isFinite(price) || price < 0 || price > MAX_PRICE) {
+    throw new Error(`Invalid price: ${price}`);
+  }
+}
 
 const seedProducts = async () => {
   const count = await prisma.product.count();
@@ -55,6 +62,7 @@ export async function addProduct(
   description: string,
 ) {
   await new Promise((resolve) => setTimeout(resolve, 1500));
+  assertValidPrice(price);
   return prisma.product.create({
     data: { title, price, description },
   });
@@ -67,6 +75,7 @@ export async function updateProduct(
   description: string,
 ) {
   await new Promise((resolve) => setTimeout(resolve, 1500));
+  assertValidPrice(price);
   return prisma.product.update({
     where: { id },
     data: { title, price, description },
